@@ -5,9 +5,11 @@ import './index.css';
 // Square コンポーネントは制御されたコンポーネント (controlled component) になった
 class Square extends React.Component {
   render() {
+    // Board から value と onClick が渡されている
     return (
       <button
         className="square"
+        // Board の this.handleClick(i) を呼び出す
         onClick={() => this.props.onClick()}
       >
         {this.props.value}
@@ -28,8 +30,11 @@ class Board extends React.Component {
   }
 
   handleClick(i) {
+    // const(定数)で定義しても配列の値は変更できる
     // squares を直接変更する代わりに、.slice() を呼んで配列のコピーを作成している
+    // なぜ？
     const squares = this.state.squares.slice();
+    // i にはクリックした番号が渡されている
     squares[i] = 'X';
     this.setState({squares: squares});
   }
@@ -38,7 +43,13 @@ class Board extends React.Component {
     // Square に props を渡す
     return (
       <Square
+        // それぞれの Square が value プロパティを受け取る
         value={this.state.squares[i]}
+        // Square が Board の state を更新できるようにする必要がある
+        // state はそれを定義しているコンポーネント内でプライベートなものだから、
+        // Square から Board の state を直接書き換えることはできない
+        // 代わりに、Board から Square に関数を渡すことにして、
+        // マス目がクリックされた時に Square にその関数を呼んでもらうようにしましょう
         onClick={() => this.handleClick(i)}
       />
     );
