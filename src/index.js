@@ -2,21 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+// Square コンポーネントは制御されたコンポーネント (controlled component) になった
 class Square extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: null,
-    };
-  }
-
   render() {
     return (
       <button
         className="square"
-        onClick={() => this.setState({value: 'X'})}
+        onClick={() => this.props.onClick()}
       >
-        {this.state.value}
+        {this.props.value}
       </button>
     );
   }
@@ -24,8 +18,30 @@ class Square extends React.Component {
 
 // Board(親) >>> Square(子)
 class Board extends React.Component {
+  // ゲームの状態を各 Square の代わりに親の Board コンポーネントで保持する
+  constructor(props) {
+    super(props);
+    this.state = {
+      // 9 個のマス目に対応する 9 個の null 値をセット
+      squares: Array(9).fill(null),
+    };
+  }
+
+  handleClick(i) {
+    // squares を直接変更する代わりに、.slice() を呼んで配列のコピーを作成している
+    const squares = this.state.squares.slice();
+    squares[i] = 'X';
+    this.setState({squares: squares});
+  }
+
   renderSquare(i) {
-    return <Square />;
+    // Square に props を渡す
+    return (
+      <Square
+        value={this.state.squares[i]}
+        onClick={() => this.handleClick(i)}
+      />
+    );
   }
 
   render() {
