@@ -3,19 +3,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 // Square コンポーネントは制御されたコンポーネント (controlled component) になった
-class Square extends React.Component {
-  render() {
-    // Board から value と onClick が渡されている
-    return (
-      <button
-        className="square"
-        // Board の this.handleClick(i) を呼び出す
-        onClick={() => this.props.onClick()}
-      >
-        {this.props.value}
-      </button>
-    );
-  }
+// 関数コンポーネントに書き換え = render メソッドだけを有して自分の state を持たないコンポーネントを、よりシンプルに書くための方法
+function Square(props) {
+  // Board から value と onClick が渡されている
+  return (
+    // Board の this.handleClick(i) を呼び出す
+    <button className="square" onClick={props.onClick}>
+      {props.value}
+    </button>
+  );
 }
 
 // Board(親) >>> Square(子)
