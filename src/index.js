@@ -32,7 +32,7 @@ class Board extends React.Component {
   handleClick(i) {
     // const(定数)で定義しても配列の値は変更できる
     // squares を直接変更する代わりに、.slice() を呼んで配列のコピーを作成している
-    // なぜ？
+    // なぜ？ => 複雑な機能が簡単に実装できる・変更の検出・React の再レンダータイミングの決定
     const squares = this.state.squares.slice();
     // i にはクリックした番号が渡されている
     squares[i] = 'X';
