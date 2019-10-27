@@ -32,6 +32,10 @@ class Board extends React.Component {
     // squares を直接変更する代わりに、.slice() を呼んで配列のコピーを作成している
     // なぜ？ => 複雑な機能が簡単に実装できる・変更の検出・React の再レンダータイミングの決定
     const squares = this.state.squares.slice();
+    // ゲームの決着が既についている場合やクリックされたマス目が既に埋まっている場合に return を返す
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
     // i にはクリックした番号が渡されている
     squares[i] = this.state.xIsNext ? 'X' : 'O';
     this.setState({
@@ -58,7 +62,13 @@ class Board extends React.Component {
   }
 
   render() {
-    const status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+    const winner = calculateWinner(this.state.squares);
+    let status;
+    if (winner) {
+      status = 'Winner: ' + winner;
+    } else {
+      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+    }
 
     return (
       <div>
@@ -105,3 +115,25 @@ ReactDOM.render(
   <Game />,
   document.getElementById('root')
 );
+
+// いずれかのプレーヤが勝利したかどうかを判定する
+// 勝負が決まっていない場合は null を返す
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
