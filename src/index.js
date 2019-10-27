@@ -22,6 +22,8 @@ class Board extends React.Component {
     this.state = {
       // 9 個のマス目に対応する 9 個の null 値をセット
       squares: Array(9).fill(null),
+      // どちらのプレイヤーの手番なのかを決める値をセット
+      xIsNext: true,
     };
   }
 
@@ -31,8 +33,12 @@ class Board extends React.Component {
     // なぜ？ => 複雑な機能が簡単に実装できる・変更の検出・React の再レンダータイミングの決定
     const squares = this.state.squares.slice();
     // i にはクリックした番号が渡されている
-    squares[i] = 'X';
-    this.setState({squares: squares});
+    squares[i] = this.state.xIsNext ? 'X' : 'O';
+    this.setState({
+      squares: squares,
+      // プレイヤーを交代するため真偽値を反転させる
+      xIsNext: !this.state.xIsNext,
+    });
   }
 
   renderSquare(i) {
@@ -52,7 +58,7 @@ class Board extends React.Component {
   }
 
   render() {
-    const status = 'Next player: X';
+    const status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
 
     return (
       <div>
