@@ -58,19 +58,21 @@ class Game extends React.Component {
     // state は状態を表す
     this.state = {
       history: [{
-        // 9 個のマス目に対応する 9 個の null 値をセット
-        squares: Array(9).fill(null),
+        squares: Array(9).fill(null),　/* 9 個のマス目に対応する 9 個の null 値をセット */
       }],
-      // どちらのプレイヤーの手番なのかを決める値をセット
-      xIsNext: true,
+      stepNumber: 0, /* いま何手目の状態を見ているのかを表す数値 */
+      xIsNext: true, /* どちらのプレイヤーの手番なのかを決める真偽値 */
     };
   }
 
+  // const(定数)で定義しても配列の値は変更できる
+  // squares を直接変更する代わりに、.slice() を呼んで配列のコピーを作成している
+  // なぜ？ => 複雑な機能が簡単に実装できる・変更の検出・React の再レンダータイミングの決定
   handleClick(i) {
-    // const(定数)で定義しても配列の値は変更できる
-    // squares を直接変更する代わりに、.slice() を呼んで配列のコピーを作成している
-    // なぜ？ => 複雑な機能が簡単に実装できる・変更の検出・React の再レンダータイミングの決定
-    const history = this.state.history; /* 全履歴 */
+    // this.state.history.slice(0, this.state.stepNumber + 1) 
+    // =>「時間の巻き戻し」をしてからその時点で新しい着手を起こした場合に、そこから見て「将来」にある履歴（もはや正しくなくなったもの）
+    // を確実に捨て去ることができます。
+    const history = this.state.history.slice(0, this.state.stepNumber + 1); /* 全履歴 */
     const current = history[history.length - 1]; /* 最新の履歴 */
     const squares = current.squares.slice(); /* 最新の盤面をコピー */
     // ゲームの決着が既についている場合やクリックされたマス目が既に埋まっている場合に return を返す
@@ -83,14 +85,22 @@ class Game extends React.Component {
       history: history.concat([{
         squares: squares, /* 最新の盤面の配列を履歴の配列(history)の末尾に結合 */
       }]),
-      // プレイヤーを交代するため真偽値を反転させる
-      xIsNext: !this.state.xIsNext,
+      stepNumber: history.length,
+      xIsNext: !this.state.xIsNext, /* プレイヤーを交代するため真偽値を反転させる */
     });
+  }
+
+  // 履歴のリストがクリックされたときに state を更新
+  jumpTo(step) {
+    this.setState({
+      stepNumber: step, /* step を巻き戻す */
+      xIsNext: (step % 2) === 0, /* 巻き戻した時のプレイヤーの順番に真偽値を変える */
+    })
   }
 
   render() {
     const history = this.state.history; /* 全履歴 */
-    const current = history[history.length - 1]; /* 最新の履歴 */
+    const current = history[this.state.stepNumber]; /* 最新の履歴 */
     const winner = calculateWinner(current.squares); /* 最新の勝敗の判定 */
 
     // 過去の手番(history)に「ジャンプ」するためのボタンの一覧を表示
@@ -101,7 +111,9 @@ class Game extends React.Component {
         'Go to move #' + move :
         'Go to move start';
       return  (
-        <li>
+        // 着手はゲームの最中に並び変わったり削除されたり挿入されたりすることはありませんから、
+        // 着手のインデックスを key として使うのは安全です。
+        <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>
       );
