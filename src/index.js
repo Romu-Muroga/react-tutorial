@@ -93,6 +93,20 @@ class Game extends React.Component {
     const current = history[history.length - 1]; /* 最新の履歴 */
     const winner = calculateWinner(current.squares); /* 最新の勝敗の判定 */
 
+    // 過去の手番(history)に「ジャンプ」するためのボタンの一覧を表示
+    // Array.map() の構文 array.map(function(currentValue, index, arr), thisValue)
+    const moves = history.map((step, move) => {
+      // 数値の 0 は false
+      const desc = move ?
+        'Go to move #' + move :
+        'Go to move start';
+      return  (
+        <li>
+          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+        </li>
+      );
+    });
+
     let status; /* state と違うので注意 */
     if (winner) {
       status = 'Winner: ' + winner;
@@ -116,7 +130,7 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{/* TODO */}</ol>
+          <ol>{moves}</ol>
         </div>
       </div>
     );
